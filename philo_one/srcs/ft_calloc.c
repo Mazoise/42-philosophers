@@ -1,32 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isnumber.c                                      :+:      :+:    :+:   */
+/*   ft_calloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/07/07 13:33:33 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/05 15:58:54 by mchardin         ###   ########.fr       */
+/*   Created: 2019/10/10 12:40:10 by mchardin          #+#    #+#             */
+/*   Updated: 2020/10/05 18:52:02 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdlib.h>
+#include <string.h>
 
-int	ft_isdigit(int c)
+void	*ft_calloc(size_t count, size_t size)
 {
-	if (c >= '0' && c <= '9')
-		return (1);
-	return (0);
-}
+	unsigned char		*str;
+	size_t				i;
 
-int ft_isnumber(const char *str)
-{
-	int		i;
-
-	i = -1;
-	if (str[0] == '-')
+	i = 0;
+	if (!(str = malloc(count * size)))
+		return (0);
+	while (i < size * count)
+	{
+		str[i] = 0;
 		i++;
-	while (str[++i])
-		if (!ft_isdigit(str[i]))
-			return (0);
-	return (1);
+	}
+	return (str);
 }
