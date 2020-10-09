@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/05 18:57:38 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/09 20:07:35 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,54 +29,90 @@ int		fill_options(t_options *options, int argc, char **argv)
 	if (argc == 6)
 		options->number_of_time_each_philosophers_must_eat = ft_atoi(argv[5]);
 	else
-		options->number_of_time_each_philosophers_must_eat = __INT32_MAX__; //ou -1?
+		options->number_of_time_each_philosophers_must_eat = -1;
+	options->table.seat = 0;
 	return (1);
 }
-void	print_line(int timestamp, int philosopher, char *action)
+
+int		print_line(struct timeval start, int philosopher, char *action) // RET ERROR
 {
-	char	*str_time;
-	char	*str_philo;
+	struct timeval  now;
 	char	*tmp;
 	char	*tmp2;
+	char	*str;
 
-	str_time = ft_itoa(timestamp);
-	str_philo = ft_itoa(philosopher + 1);
-	tmp = ft_strjoin(str_time, " ");
-	tmp2 = ft_strjoin(tmp, str_philo);
+	tmp = ft_itoa(philosopher + 1);
+	tmp2 = ft_strjoin(tmp, action);
 	free(tmp);
-	tmp = ft_strjoin(tmp2, action);
-	ft_putstr_fd(tmp, 1);
-	free(str_time);
-	free(str_philo);
+	tmp = ft_strjoin(" ", tmp2);
+	free(tmp2);
+	if (gettimeofday(&now, NULL) < 0)
+		return (0);
+	tmp2 = ft_itoa((now.tv_sec - start.tv_sec) * 1000
+	+ (now.tv_usec - start.tv_usec) / 1000);
+	str = ft_strjoin(tmp2, tmp);
+	ft_putstr_fd(str, 1);
 	free(tmp);
 	free(tmp2);
+	free(str);
+	return (1);
 }
 
-int		id_cloud(t_cloud *cloud)
-{
-	int		i;
-
-	i = -1;	
-	while(cloud[++i].taken == 1)
-		;
-	cloud[i].taken = 1;
-	return (i);
-}
-
-void	*print_timestamp(void *tmp)
+void	*create_life(void *tmp)
 {
 	t_options		*options;
-	struct timeval  now;
-	int				perso_nb;
+	t_perso			perso;
+	struct timeval	now;
+	void			*ret;
 
 	options = tmp;
-	perso_nb = id_cloud(options->cloud);
-	if (gettimeofday(&now, NULL) < 0)
-		return ((void *)1); //WHICH VALUE??
-	// while (1)
+	perso.id = options->table.seat++;
+	perso.forks[0] = perso.id == 0 ? options->number_of_philosopher - 1 : perso.id - 1;
+	perso.forks[1] = perso.id;
+	perso.last_meal = options->start;
+	perso.meals_left = options->number_of_time_each_philosophers_must_eat;
+	if (perso.id != options->number_of_philosopher - 1)
+		pthread_join(options->philos[perso.id + 1], &ret);
+	while (perso.meals_left < 0 ? 1 : perso.meals_left--)
 	{
-		print_line((now.tv_usec - options->start.tv_usec) / 10,
-		perso_nb, AC_FORK);
+		while (options->table.fork[perso.forks[0]] || options->table.fork[perso.forks[1]])
+		{
+			if (gettimeofday(&now, NULL) < 0)
+				return (0);
+			if ((now.tv_sec - perso.last_meal.tv_sec) * 1000
++ (now.tv_usec - perso.last_meal.tv_usec) / 1000 >= options->time_to_die)
+			{
+				print_line(options->start, perso.id, AC_DIE);
+				return (0);
+			}
+		}
+		options->table.fork[perso.forks[0]] = 1;
+		print_line(options->start, perso.id, AC_FORK);
+		options->table.fork[perso.forks[1]] = 1;
+		print_line(options->start, perso.id, AC_FORK);
+		print_line(options->start, perso.id, AC_EAT);
+		if (gettimeofday(&perso.last_meal, NULL) < 0)
+			return (0);
+		if (options->time_to_eat <= options->time_to_die)
+			usleep(1000 * options->time_to_eat);
+		else
+		{
+			usleep(1000 * options->time_to_die);
+			print_line(options->start, perso.id, AC_DIE);
+			return (0);
+		}
+		options->table.fork[perso.forks[0]] = 0;
+		options->table.fork[perso.forks[1]] = 0;
+		print_line(options->start, perso.id, AC_SLEEP);
+		if (options->time_to_eat + options->time_to_sleep <= options->time_to_die)
+			usleep(1000 * options->time_to_sleep);
+		else
+		{
+			usleep(1000 * (options->time_to_die - options->time_to_eat));
+			print_line(options->start, perso.id, AC_DIE);
+			return (0);
+		}
+		print_line(options->start, perso.id, AC_THINK);
 	}
 	return (0);
 }
@@ -84,28 +120,29 @@ void	*print_timestamp(void *tmp)
 int		run_threads(pthread_t *philos, t_options *options)
 {
 	int		i;
+	void	*ret;
 
 	i = -1;
 	while (++i < options->number_of_philosopher)
-		if (pthread_create(&philos[i], NULL, &print_timestamp, options))
+	{
+		if (pthread_create(&philos[i], NULL, &create_life, options))
 			return (0);
+	}
+	pthread_join(philos[0], &ret);
 	return (1);
 }
 
 int		main(int argc, char **argv)
 {
 	t_options		options;
-	pthread_t		*philos;
 
 	if (argc < 5 || argc > 6 || !fill_options(&options, argc, argv))
 		return (0);
 	if (gettimeofday(&options.start, NULL) < 0) // CHECK IF WORK
 		return (0);
-	if (!(philos = ft_calloc(sizeof(pthread_t), options.number_of_philosopher))
-		|| !(options.cloud = ft_calloc(sizeof(t_cloud), options.number_of_philosopher)))
+	if (!(options.philos = ft_calloc(options.number_of_philosopher, sizeof(pthread_t)))
+		|| !(options.table.fork = ft_calloc(options.number_of_philosopher, sizeof(int))))
 		return (0);
-	if (!run_threads(philos, &options))
+	if (!run_threads(options.philos, &options))
 		return (0);
-	while (1)
-		;
 }

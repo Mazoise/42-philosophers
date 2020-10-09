@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/05 18:53:02 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/09 19:56:22 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,24 @@
 
 # define AC_FORK " has taken a fork\n"
 # define AC_EAT " is eating\n"
-# define AC_SLEEP " is eating\n"
+# define AC_SLEEP " is sleeping\n"
 # define AC_THINK " is thinking\n"
 # define AC_DIE " died\n"
 
-typedef struct	s_cloud
+typedef struct	s_table
 {
-	int				taken;
-	
-}				t_cloud;
+	int				seat;
+	int				*fork;
+	int				death;
+}				t_table;
+
+typedef struct	s_perso
+{
+	int				id;
+	int				forks[2];
+	struct timeval	last_meal;
+	int				meals_left;
+}				t_perso;
 
 typedef struct  s_options
 {
@@ -40,7 +49,8 @@ typedef struct  s_options
 	int				time_to_sleep;
 	int				number_of_time_each_philosophers_must_eat;
 	struct timeval  start;
-	t_cloud			*cloud;
+	pthread_t		*philos;
+	t_table			table;
 }				t_options;
 
 int		ft_isnumber(const char *str);
