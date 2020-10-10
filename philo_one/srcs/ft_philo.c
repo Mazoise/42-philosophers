@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/09 20:07:35 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/10 15:43:03 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,28 +19,33 @@ int		fill_options(t_options *options, int argc, char **argv)
 	i = 0;
 	while (++i < argc)
 	{
-		if (!ft_isnumber(argv[i])) //CANNOT BE NEGATIVE, MODIFY FONCTION?
+		if (!ft_isnumber(argv[i]) || argv[i][0] == '-') //CANNOT BE NEGATIVE, MODIFY FONCTION?
 			return (0);
 	}
-	options->number_of_philosopher = ft_atoi(argv[1]);
-	options->time_to_die = ft_atoi(argv[2]);
-	options->time_to_eat = ft_atoi(argv[3]);
-	options->time_to_sleep = ft_atoi(argv[4]);
+	if (!(options->number_of_philosopher = ft_atoi(argv[1])))
+		return (0);
+	options->time_to_die = 1000 * ft_atoi(argv[2]);
+	options->time_to_eat = 1000 * ft_atoi(argv[3]);
+	options->time_to_sleep = 1000 * ft_atoi(argv[4]);
 	if (argc == 6)
 		options->number_of_time_each_philosophers_must_eat = ft_atoi(argv[5]);
 	else
 		options->number_of_time_each_philosophers_must_eat = -1;
 	options->table.seat = 0;
+	options->table.death = 0;
+	pthread_mutex_init(&options->mutex, NULL);
 	return (1);
 }
 
-int		print_line(struct timeval start, int philosopher, char *action) // RET ERROR
+int		print_line(struct timeval start, int philosopher, char *action, int death) // RET ERROR
 {
 	struct timeval  now;
 	char	*tmp;
 	char	*tmp2;
 	char	*str;
 
+	if (death == 1)
+		return (0);
 	tmp = ft_itoa(philosopher + 1);
 	tmp2 = ft_strjoin(tmp, action);
 	free(tmp);
@@ -63,58 +68,83 @@ void	*create_life(void *tmp)
 	t_options		*options;
 	t_perso			perso;
 	struct timeval	now;
-	void			*ret;
 
 	options = tmp;
+	pthread_mutex_lock(&options->mutex);
 	perso.id = options->table.seat++;
+	pthread_mutex_unlock(&options->mutex);
+	if (options->number_of_philosopher == 1)
+	{
+		usleep(options->time_to_die);
+		print_line(options->start, perso.id, AC_DIE, options->table.death);
+		return (NULL);
+	}
 	perso.forks[0] = perso.id == 0 ? options->number_of_philosopher - 1 : perso.id - 1;
 	perso.forks[1] = perso.id;
 	perso.last_meal = options->start;
 	perso.meals_left = options->number_of_time_each_philosophers_must_eat;
-	if (perso.id != options->number_of_philosopher - 1)
-		pthread_join(options->philos[perso.id + 1], &ret);
 	while (perso.meals_left < 0 ? 1 : perso.meals_left--)
 	{
+		pthread_mutex_lock(&options->mutex);
 		while (options->table.fork[perso.forks[0]] || options->table.fork[perso.forks[1]])
 		{
+			pthread_mutex_unlock(&options->mutex);
 			if (gettimeofday(&now, NULL) < 0)
-				return (0);
-			if ((now.tv_sec - perso.last_meal.tv_sec) * 1000
-+ (now.tv_usec - perso.last_meal.tv_usec) / 1000 >= options->time_to_die)
+				return (NULL);
+			if ((now.tv_sec - perso.last_meal.tv_sec) * 1000000
++ (now.tv_usec - perso.last_meal.tv_usec) >= options->time_to_die)
 			{
-				print_line(options->start, perso.id, AC_DIE);
-				return (0);
+				pthread_mutex_lock(&options->mutex);
+				print_line(options->start, perso.id, AC_DIE, options->table.death);
+				options->table.death = 1;
+				pthread_mutex_unlock(&options->mutex);
+				return (NULL);
 			}
+			pthread_mutex_lock(&options->mutex);
 		}
 		options->table.fork[perso.forks[0]] = 1;
-		print_line(options->start, perso.id, AC_FORK);
 		options->table.fork[perso.forks[1]] = 1;
-		print_line(options->start, perso.id, AC_FORK);
-		print_line(options->start, perso.id, AC_EAT);
+		pthread_mutex_unlock(&options->mutex);
+		if (!print_line(options->start, perso.id, AC_FORK, options->table.death))
+			return (NULL);
+		if (!print_line(options->start, perso.id, AC_FORK, options->table.death))
+			return (NULL);
+		if (!print_line(options->start, perso.id, AC_EAT, options->table.death))
+			return (NULL);
 		if (gettimeofday(&perso.last_meal, NULL) < 0)
-			return (0);
+			return (NULL);
 		if (options->time_to_eat <= options->time_to_die)
-			usleep(1000 * options->time_to_eat);
+			usleep(options->time_to_eat);
 		else
 		{
-			usleep(1000 * options->time_to_die);
-			print_line(options->start, perso.id, AC_DIE);
-			return (0);
+			usleep(options->time_to_die);
+			pthread_mutex_lock(&options->mutex);
+			print_line(options->start, perso.id, AC_DIE, options->table.death);
+			options->table.death = 1;
+			pthread_mutex_unlock(&options->mutex);
+			return (NULL);
 		}
+		pthread_mutex_lock(&options->mutex);
 		options->table.fork[perso.forks[0]] = 0;
 		options->table.fork[perso.forks[1]] = 0;
-		print_line(options->start, perso.id, AC_SLEEP);
+		pthread_mutex_unlock(&options->mutex);
+		if (!print_line(options->start, perso.id, AC_SLEEP, options->table.death))
+			return (NULL);
 		if (options->time_to_eat + options->time_to_sleep <= options->time_to_die)
-			usleep(1000 * options->time_to_sleep);
+			usleep(options->time_to_sleep);
 		else
 		{
-			usleep(1000 * (options->time_to_die - options->time_to_eat));
-			print_line(options->start, perso.id, AC_DIE);
-			return (0);
+			usleep((options->time_to_die - options->time_to_eat));
+			pthread_mutex_lock(&options->mutex);
+			print_line(options->start, perso.id, AC_DIE, options->table.death);
+			options->table.death = 1;
+			pthread_mutex_unlock(&options->mutex);
+			return (NULL);
 		}
-		print_line(options->start, perso.id, AC_THINK);
+		if (!print_line(options->start, perso.id, AC_THINK, options->table.death))
+			return (NULL);
 	}
-	return (0);
+	return (NULL);
 }
 
 int		run_threads(pthread_t *philos, t_options *options)

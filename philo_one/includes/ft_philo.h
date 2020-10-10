@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/09 19:56:22 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/10 15:25:33 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ typedef struct  s_options
 	struct timeval  start;
 	pthread_t		*philos;
 	t_table			table;
+	pthread_mutex_t	mutex;
 }				t_options;
 
 int		ft_isnumber(const char *str);

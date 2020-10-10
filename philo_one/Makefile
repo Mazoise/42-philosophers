@@ -6,7 +6,7 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/07 13:07:53 by mchardin          #+#    #+#              #
-#    Updated: 2020/10/09 20:09:08 by mchardin         ###   ########.fr        #
+#    Updated: 2020/10/10 15:37:04 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ ${NAME}:	${OBJS} ${INCL_FILES}
 			${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 
 run:		all
-			./$(NAME) 6 100 40 80 30
+			./$(NAME) 20 120 50 50 10
 
 clean:
 			${RM} ${OBJS}
