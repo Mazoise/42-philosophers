@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/10 15:25:33 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/11 21:55:37 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,13 @@
 # define AC_THINK " is thinking\n"
 # define AC_DIE " died\n"
 
+typedef struct	s_print
+{
+	char			*action;
+	struct timeval	start;
+	int				id;
+}				t_print;
+
 typedef struct	s_table
 {
 	int				seat;
@@ -43,13 +50,18 @@ typedef struct	s_perso
 
 typedef struct  s_options
 {
-	int		 		number_of_philosopher;
+	int		 		number_of_philosophers;
 	int		 		time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				number_of_time_each_philosophers_must_eat;
+	int				time_to_think;
+	int				time_to_eat_sleep;
+	int				time_to_sleep_think;
+	int				time_two_meals;
+	int				number_of_meals;
 	struct timeval  start;
 	pthread_t		*philos;
+	pthread_t		*prints;
 	t_table			table;
 	pthread_mutex_t	mutex;
 }				t_options;
