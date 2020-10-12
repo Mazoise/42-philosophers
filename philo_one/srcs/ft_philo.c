@@ -6,11 +6,29 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/11 21:59:04 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/12 18:07:10 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_philo.h"
+
+void		usleep_opti(int time)
+{
+	int		time2;
+
+	time2 = time * 500;
+	usleep(time2);
+	usleep(time2);
+}
+
+long		get_time()
+{
+	struct timeval  now;
+
+	if (gettimeofday(&now, NULL) < 0)
+		return (0);
+	return (now.tv_sec * 1000 + now.tv_usec / 1000);
+}
 
 int		fill_options(t_options *options, int argc, char **argv)
 {
@@ -24,9 +42,9 @@ int		fill_options(t_options *options, int argc, char **argv)
 	}
 	if (!(options->number_of_philosophers = ft_atoi(argv[1])))
 		return (0);
-	options->time_to_die = 1000 * ft_atoi(argv[2]);
-	options->time_to_eat = 1000 * ft_atoi(argv[3]);
-	options->time_to_sleep = 1000 * ft_atoi(argv[4]);
+	options->time_to_die = ft_atoi(argv[2]);
+	options->time_to_eat = ft_atoi(argv[3]);
+	options->time_to_sleep = ft_atoi(argv[4]);
 	if (argc == 6)
 		options->number_of_meals = ft_atoi(argv[5]);
 	else
@@ -41,54 +59,69 @@ int		fill_options(t_options *options, int argc, char **argv)
 	return (1);
 }
 
+char	*msg_action(int action)
+{
+	if (action == MSG_FORK)
+		return (AC_FORK);
+	if (action == MSG_DIE)
+		return (AC_DIE);
+	if (action == MSG_EAT)
+		return (AC_EAT);
+	if (action == MSG_SLEEP)
+		return (AC_SLEEP);
+	if (action == MSG_THINK)
+		return (AC_THINK);
+	return (NULL);
+}
+
 void	*print_thread(void *tmp_print)
 {
 	t_print			*print;
-	struct timeval  now;
+	long			time;
 	char			*tmp;
 	char			*tmp2;
 	char			*str;
 
+	if (!(time = get_time()))
+		return (NULL);
 	print = tmp_print;
-	ft_putstr_fd(print->action, 1);
 	tmp = ft_itoa(print->id + 1);
-	tmp2 = ft_strjoin(tmp, print->action);
+	tmp2 = ft_strjoin(tmp, msg_action(print->action));
 	free(tmp);
 	tmp = ft_strjoin(" ", tmp2);
 	free(tmp2);
-	if (gettimeofday(&now, NULL) < 0)
-		return (NULL);
-	tmp2 = ft_itoa((now.tv_sec - print->start.tv_sec) * 1000
-	+ (now.tv_usec - print->start.tv_usec) / 1000);
+	tmp2 = ft_itoa(time - print->start);
 	str = ft_strjoin(tmp2, tmp);
-	// ft_putstr_fd(str, 1);
+	ft_putstr_fd(str, 1);
 	free(tmp);
 	free(tmp2);
 	free(str);
 	return (NULL);
 }
 
-int		print_line(t_options *options, int id, char *action, int death)
+int		print_line(t_options *options, int id, int action, int death)
 {
-	t_print			print;
+	t_print			*print;
+	pthread_t		printer;
 
 	if (death == 1)
 		return (0);
-	print.action = action;
-	print.start = options->start;
-	print.id = id;
-	if (pthread_create(&options->prints[id], NULL, &print_thread, &print))
+	print = malloc(sizeof(t_print));
+	print->action = action;
+	print->start = options->start;
+	print->id = id;
+	if (pthread_create(&printer, NULL, &print_thread, print))
 			return (0);
-	pthread_detach(options->prints[id]);
+	pthread_detach(printer);
 	return (1);
 }
 
 int		dead_philo(t_options *options, t_perso *perso, int time_death)
 {
 	if (time_death)
-		usleep(time_death);
+		usleep_opti(time_death);
 	pthread_mutex_lock(&options->mutex);
-	print_line(options, perso->id, AC_DIE, options->table.death);
+	print_line(options, perso->id, MSG_DIE, options->table.death);
 	options->table.death = 1;
 	pthread_mutex_unlock(&options->mutex);
 	return (0);
@@ -102,7 +135,7 @@ int		define_philosopher(t_options *options, t_perso *perso)
 	if (options->number_of_philosophers == 1)
 		return (dead_philo(options, perso, options->time_to_die));
 	if (perso->id % 2)
-		usleep(options->time_to_eat / 2);
+		usleep_opti(options->time_to_eat / 2);
 	perso->forks[0] = perso->id == 0 ?
 	options->number_of_philosophers - 1 : perso->id - 1;
 	perso->forks[1] = perso->id;
@@ -113,17 +146,16 @@ int		define_philosopher(t_options *options, t_perso *perso)
 
 int		wait_for_fork(t_options *options, t_perso *perso)
 {
-	struct timeval	now;
+	long	now;
 
 	pthread_mutex_lock(&options->mutex);
 	while (options->table.fork[perso->forks[0]]
 	|| options->table.fork[perso->forks[1]])
 	{
 		pthread_mutex_unlock(&options->mutex);
-		if (gettimeofday(&now, NULL) < 0)
+		if (!(now = get_time()))
 			return (0);
-		if ((now.tv_sec - perso->last_meal.tv_sec) * 1000000
-+ (now.tv_usec - perso->last_meal.tv_usec) >= options->time_to_die)
+		if (now - perso->last_meal >= options->time_to_die)
 			return (dead_philo(options, perso, 0));
 		pthread_mutex_lock(&options->mutex);
 	}
@@ -134,18 +166,18 @@ int		meal_time(t_options *options, t_perso *perso)
 {
 	options->table.fork[perso->forks[0]] = 1;
 	options->table.fork[perso->forks[1]] = 1;
-	if (!print_line(options, perso->id, AC_FORK, options->table.death)
-	|| !print_line(options, perso->id, AC_FORK, options->table.death)
-	|| !print_line(options, perso->id, AC_EAT, options->table.death))
+	if (!print_line(options, perso->id, MSG_FORK, options->table.death)
+	|| !print_line(options, perso->id, MSG_FORK, options->table.death)
+	|| !print_line(options, perso->id, MSG_EAT, options->table.death))
 	{
 		pthread_mutex_unlock(&options->mutex);
 		return (0);
 	}
 	pthread_mutex_unlock(&options->mutex);
-	if (gettimeofday(&perso->last_meal, NULL) < 0)
+		if (!(perso->last_meal = get_time()))
 		return (0);
-	if (options->time_to_eat < options->time_to_die)
-		usleep(options->time_to_eat);
+	if (options->time_to_eat <= options->time_to_die)
+		usleep_opti(options->time_to_eat);
 	else
 		return (dead_philo(options, perso, options->time_to_die));
 	pthread_mutex_lock(&options->mutex);
@@ -158,11 +190,11 @@ int		meal_time(t_options *options, t_perso *perso)
 int		sleeping_time(t_options *options, t_perso *perso)
 {
 	pthread_mutex_lock(&options->mutex);
-	if (!print_line(options, perso->id, AC_SLEEP, options->table.death))
+	if (!print_line(options, perso->id, MSG_SLEEP, options->table.death))
 		return (0);
 	pthread_mutex_unlock(&options->mutex);
-	if (options->time_to_eat_sleep < options->time_to_die)
-		usleep(options->time_to_sleep);
+	if (options->time_to_eat_sleep <= options->time_to_die)
+		usleep_opti(options->time_to_sleep);
 	else
 		return (dead_philo(options, perso, options->time_to_sleep_think));
 	return (1);
@@ -171,10 +203,10 @@ int		sleeping_time(t_options *options, t_perso *perso)
 int		thinking_time(t_options *options, t_perso *perso)
 {
 	pthread_mutex_lock(&options->mutex);
-	if (!print_line(options, perso->id, AC_THINK, options->table.death))
+	if (!print_line(options, perso->id, MSG_THINK, options->table.death))
 		return (0);
 	pthread_mutex_unlock(&options->mutex);
-	usleep(options->time_to_think / 2);
+	usleep_opti(options->time_to_think / 2);
 	return (1);
 }
 
@@ -206,14 +238,14 @@ int		run_threads(pthread_t *philos, t_options *options)
 	void	*ret;
 
 	i = -1;
-	if (gettimeofday(&options->start, NULL) < 0)
+		if (!(options->start = get_time()))
 		return (0);
 	while (++i < options->number_of_philosophers)
-	{
 		if (pthread_create(&philos[i], NULL, &create_life, options))
 			return (0);
-	}
-	pthread_join(philos[0], &ret);
+	i = -1;
+	while (++i < options->number_of_philosophers)
+		pthread_join(philos[i], &ret);
 	return (1);
 }
 
@@ -224,12 +256,10 @@ int		main(int argc, char **argv)
 	if (argc < 5 || argc > 6 || !fill_options(&options, argc, argv))
 		return (0);
 	if (!(options.philos = ft_calloc(options.number_of_philosophers, sizeof(pthread_t)))
-		|| !(options.table.fork = ft_calloc(options.number_of_philosophers, sizeof(int)))
-		|| !(options.prints = ft_calloc(options.number_of_philosophers, sizeof(pthread_t))))
+		|| !(options.table.fork = ft_calloc(options.number_of_philosophers, sizeof(int))))
 		return (0);
 	if (!run_threads(options.philos, &options))
 		return (0);
 	free(options.philos);
-	free(options.prints);
 	free(options.table.fork);
 }

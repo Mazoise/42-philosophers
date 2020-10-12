@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/11 21:55:37 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/12 17:31:08 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,19 @@
 # define AC_THINK " is thinking\n"
 # define AC_DIE " died\n"
 
+typedef enum	e_msg
+{
+	MSG_FORK,
+	MSG_EAT,
+	MSG_SLEEP,
+	MSG_THINK,
+	MSG_DIE
+}				t_msg;
+
 typedef struct	s_print
 {
-	char			*action;
-	struct timeval	start;
+	int				action;
+	long			start;
 	int				id;
 }				t_print;
 
@@ -44,7 +53,7 @@ typedef struct	s_perso
 {
 	int				id;
 	int				forks[2];
-	struct timeval	last_meal;
+	long			last_meal;
 	int				meals_left;
 }				t_perso;
 
@@ -59,9 +68,8 @@ typedef struct  s_options
 	int				time_to_sleep_think;
 	int				time_two_meals;
 	int				number_of_meals;
-	struct timeval  start;
+	long		  start;
 	pthread_t		*philos;
-	pthread_t		*prints;
 	t_table			table;
 	pthread_mutex_t	mutex;
 }				t_options;
