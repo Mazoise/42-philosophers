@@ -6,7 +6,7 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/07 13:07:53 by mchardin          #+#    #+#              #
-#    Updated: 2020/10/12 18:06:10 by mchardin         ###   ########.fr        #
+#    Updated: 2020/10/16 16:14:52 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,13 +18,16 @@ INCL_FILES	=	$(addprefix $(INCLUDES), ft_philo.h)
 
 SRCS		=	$(addprefix $(PREFIX), \
 								ft_philo.c \
+								ft_print.c \
+								ft_life.c \
+								ft_utils.c \
 								ft_atoi.c \
-								ft_isnumber.c \
-								ft_putnbr_fd.c \
-								ft_putstr_fd.c \
-								ft_itoa.c \
-								ft_strjoin.c \
 								ft_calloc.c \
+								ft_isnumber.c \
+								ft_itoa.c \
+								ft_putstr_fd.c \
+								ft_strlen.c \
+								ft_strncmp.c \
 								)
 
 OBJS		=	${SRCS:.c=.o}
@@ -44,7 +47,7 @@ ${NAME}:	${OBJS} ${INCL_FILES}
 			${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 
 run:		all
-			./$(NAME) 4 410 200 200
+			./$(NAME) 3 620 200 200
 
 clean:
 			${RM} ${OBJS}
