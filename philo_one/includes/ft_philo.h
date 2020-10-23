@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/16 16:43:02 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/23 19:07:09 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,18 +38,17 @@ typedef enum	e_msg
 typedef struct	s_table
 {
 	int				seat;
-	int				*fork;
 	int				death;
+	int				finished_eating;
 }				t_table;
 
-typedef struct	s_perso
+typedef struct  s_mutex
 {
-	int				id;
-	int				fork[2];
-	int				fork_id[2];
-	long			last_meal;
-	int				meals_left;
-}				t_perso;
+	pthread_mutex_t		death;
+	pthread_mutex_t		msg;
+	pthread_mutex_t		seat;
+	pthread_mutex_t		*fork;
+}				t_mutex;
 
 typedef struct  s_options
 {
@@ -58,30 +57,35 @@ typedef struct  s_options
 	int				t_eat;
 	int				t_sleep;
 	int				t_think;
-	int				t_eat_sleep;
-	int				t_sleep_think;
-	int				t_two_meals;
 	int				nb_meals;
-	int				msg_list;
-	int				msg_nb;
 	long		 	start;
+	long		 	time;
 	pthread_t		*philos;
 	t_table			table;
-	pthread_mutex_t	mutex;
+	t_mutex			mutex;
 }				t_options;
+
+typedef struct	s_perso
+{
+	int				id;
+	int				fork_id[2];
+	long			last_meal;
+	int				meals_left;
+	t_options		*options;
+}				t_perso;
 
 typedef struct	s_print
 {
 	int				action;
-	t_options		*options;
 	int				id;
-	int				msg_nb;
 	long			time;
+	t_options		*options;
 }				t_print;
 
 int		ft_isnumber(const char *str);
 int		ft_atoi(const char *str);
 void	ft_putstr_fd(char *s, int fd);
+void	ft_putnbrpos_fd(long n, int fd);
 int		ft_strlen(const char *s);
 char	*ft_itoa(int n);
 void	*ft_calloc(size_t count, size_t size);
@@ -90,13 +94,10 @@ int		print_line(t_options *options, int id, int action);
 void	*print_thread(void *tmp);
 void	print_philo(char *s1, char *s2, char *s3, t_print *print);
 char	*msg_action(int action);
-int		thinking_time(t_options *options, t_perso *perso);
-int		sleeping_time(t_options *options, t_perso *perso);
-int		meal_time(t_options *options, t_perso *perso);
-int		wait_for_fork(t_options *options, t_perso *perso);
+void	eat_sleep_think(t_options *options, t_perso *perso);
 int		dead_philo(t_options *options, t_perso *perso, int t_death);
-int		take_forks(t_options *options, t_perso *perso);
 void	usleep_opti(int time);
 long	get_time();
+void	*time_thread(void *tmp);
 
 #endif

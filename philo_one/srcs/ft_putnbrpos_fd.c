@@ -1,45 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_utils.c                                         :+:      :+:    :+:   */
+/*   ft_putnbrpos_fd.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/16 14:35:23 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/23 18:37:17 by mchardin         ###   ########.fr       */
+/*   Created: 2019/10/09 15:25:40 by mchardin          #+#    #+#             */
+/*   Updated: 2020/10/23 19:02:53 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
 #include "ft_philo.h"
 
-long		get_time()
+void	ft_putnbrpos_fd(long n, int fd)
 {
-	struct timeval  now;
+	char	nb[11];
+	int		i;
 
-	if (gettimeofday(&now, NULL) < 0)
-		return (0);
-	return (now.tv_sec * 1000000 + now.tv_usec);
-}
-
-void	*time_thread(void *tmp)
-{
-	t_options		*options;
-
-	while (1)
+	i = 10;
+	nb[10] = 0;
+	while (n > 0)
 	{
-		options = tmp;
-		if (!(options->time = get_time()))
-			return (NULL);
+		nb[i] = '0' + n % 10;
+		n = n / 10;
+		i--;
 	}
-	return (NULL);
+	ft_putstr_fd(&nb[++i], fd);
 }
-
-// void		usleep_opti(int time)
-// {
-// 	int		time2;
-
-// 	time2 = 500 * time;
-// 	usleep(time2);
-// 	usleep(time2);
-// 	return ;
-// }
