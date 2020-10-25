@@ -6,13 +6,13 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:35:23 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/23 18:37:17 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/25 18:58:32 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_philo.h"
 
-long		get_time()
+long 	get_time()
 {
 	struct timeval  now;
 
@@ -25,9 +25,11 @@ void	*time_thread(void *tmp)
 {
 	t_options		*options;
 
+	options = tmp;
 	while (1)
 	{
-		options = tmp;
+		if (options->table.end)
+			return (NULL);
 		if (!(options->time = get_time()))
 			return (NULL);
 	}

@@ -6,7 +6,7 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/07 13:07:53 by mchardin          #+#    #+#              #
-#    Updated: 2020/10/23 18:57:21 by mchardin         ###   ########.fr        #
+#    Updated: 2020/10/25 19:17:26 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,7 @@ SRCS		=	$(addprefix $(PREFIX), \
 								ft_calloc.c \
 								ft_isnumber.c \
 								ft_itoa.c \
-								ft_putstr_fd.c \
-								ft_putnbr_fd.c \
+								ft_putnbrphilo_fd.c \
 								ft_strlen.c \
 								ft_strncmp.c \
 								)
@@ -48,7 +47,7 @@ ${NAME}:	${OBJS} ${INCL_FILES}
 			${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 
 run:		all
-			./$(NAME) 4 210 100 100
+			./$(NAME) 4 150 100 100 1
 
 clean:
 			${RM} ${OBJS}
