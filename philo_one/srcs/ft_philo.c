@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/25 19:07:29 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/27 11:47:24 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int		fill_options(t_options *options, int argc, char **argv)
 	i = 0;
 	while (++i < argc)
 	{
-		if (!ft_isnumber(argv[i]) || argv[i][0] == '-')
+		if (!ft_isposnumber(argv[i]))
 			return (0);
 	}
 	if (!(options->nb_philos = ft_atoi(argv[1])))
@@ -31,7 +31,7 @@ int		fill_options(t_options *options, int argc, char **argv)
 		options->nb_meals = ft_atoi(argv[5]);
 	else
 		options->nb_meals = -1;
-	options->table.finished_eating = options->nb_philos;
+	options->table.still_eating = options->nb_philos;
 	pthread_mutex_init(&options->mutex.end, NULL);
 	pthread_mutex_init(&options->mutex.msg, NULL);
 	pthread_mutex_init(&options->mutex.seat, NULL);
@@ -64,6 +64,8 @@ void	*action_thread(void *tmp)
 		usleep(1000);
 	else if (perso->id  == options->nb_philos - 1)
 		usleep(2000);
+	else
+		usleep(perso->id);
 	while (perso->meals_left < 0 ? 1 : perso->meals_left--)
 		eat_sleep_think(options, perso);
 	while (1)
@@ -86,14 +88,10 @@ void	*life_thread(void *tmp)
 	while (1)
 	{
 		if (options->table.end)
-		{
-			usleep(100000);	
 			return (NULL);
-		}
 		else if (options->time - perso.last_meal > options->t_die)
 		{
 			print_line(options, perso.id, MSG_DIE);
-			usleep(100000);
 			return (NULL);
 		}
 	}
@@ -107,16 +105,16 @@ int		run_threads(pthread_t *philos, t_options *options)
 	i = -1;
 	while (++i < options->nb_philos)
 		pthread_mutex_init(&options->mutex.fork[i], NULL);
-	i = 0;
 	if (pthread_create(&philos[0], NULL, &time_thread, options))
 		return (0);
 	if (!(options->start = get_time()))
 		return (0);
 	options->time = options->start;
+	i = 0;
 	while (++i <= options->nb_philos)
 		if (pthread_create(&philos[i], NULL, &life_thread, options))
 			return (0);
-	i = 0;
+	i = -1;
 	while (++i <= options->nb_philos)
 		pthread_join(philos[i], NULL);
 	return (1);
@@ -149,7 +147,6 @@ int		main(int argc, char **argv)
 		return (0);
 	if (!run_threads(options.philos, &options))
 		return (0);
-	usleep(10000);
 	clean_all(&options);
 	return (0);
 }

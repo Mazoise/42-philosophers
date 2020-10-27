@@ -1,29 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncmp.c                                       :+:      :+:    :+:   */
+/*   ft_putnbrphilo.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/07 12:37:56 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/16 15:22:14 by mchardin         ###   ########.fr       */
+/*   Created: 2019/10/09 15:25:40 by mchardin          #+#    #+#             */
+/*   Updated: 2020/10/27 09:07:19 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string.h>
+#include <unistd.h>
+#include "ft_philo.h"
 
-int		ft_strncmp(const char *s1, const char *s2, size_t n)
+void	ft_putnbrphilo(int n)
 {
-	size_t	i;
+	char	nb[11];
+	int		i;
 
-	i = 0;
-	while ((s1[i] || s2[i]) && i < n)
+	i = 9;
+	nb[10] = ' ';
+	while (n > 9)
 	{
-		if (s1[i] != s2[i])
-			return ((unsigned const char)s1[i] - (unsigned const char)s2[i]);
-		else if (i == n || (s1[i] == 0 && s2[i] == 0))
-			return (0);
-		i++;
+		nb[i] = '0' + n % 10;
+		n = n / 10;
+		i--;
 	}
-	return (0);
+	nb[i] = '0' + n % 10;
+	write(1, &nb[i], 11 - i);
 }

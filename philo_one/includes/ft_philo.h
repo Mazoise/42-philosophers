@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/25 19:03:47 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/27 09:07:47 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ typedef struct	s_table
 {
 	int				seat;
 	int				end;
-	int				finished_eating;
+	int				still_eating;
 }				t_table;
 
 typedef struct  s_mutex
@@ -82,14 +82,11 @@ typedef struct	s_print
 	t_options		*options;
 }				t_print;
 
-int		ft_isnumber(const char *str);
+int		ft_isposnumber(const char *str);
 int		ft_atoi(const char *str);
-void	ft_putstr_fd(char *s, int fd);
-void	ft_putnbrphilo_fd(unsigned int n, int fd);
-int		ft_strlen(const char *s);
+void	ft_putnbrphilo(int n);
 char	*ft_itoa(int n);
 void	*ft_calloc(size_t count, size_t size);
-int		ft_strncmp(const char *s1, const char *s2, size_t n);
 int		print_line(t_options *options, int id, int action);
 void	*print_thread(void *tmp);
 void	print_philo(char *s1, char *s2, char *s3, t_print *print);

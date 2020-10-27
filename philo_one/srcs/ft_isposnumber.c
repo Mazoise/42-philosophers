@@ -1,21 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstrphilo_fd.c                                :+:      :+:    :+:   */
+/*   ft_isposnumber.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/09 15:14:41 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/25 16:50:29 by mchardin         ###   ########.fr       */
+/*   Created: 2020/07/07 13:33:33 by mchardin          #+#    #+#             */
+/*   Updated: 2020/10/27 09:05:20 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include "ft_philo.h"
 
-void	ft_putstrphilo_fd(char *s, int fd, int len)
+int	ft_isdigit(int c)
 {
-	if (!s)
-		return ;
-	write(fd, s, len);
+	if (c >= '0' && c <= '9')
+		return (1);
+	return (0);
+}
+
+int ft_isposnumber(const char *str)
+{
+	int		i;
+
+	i = -1;
+	while (str[++i])
+		if (!ft_isdigit(str[i]))
+			return (0);
+	return (1);
 }

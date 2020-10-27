@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:35:23 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/25 18:58:32 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/27 11:43:04 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,7 @@ void	*time_thread(void *tmp)
 	options = tmp;
 	while (1)
 	{
-		if (options->table.end)
-			return (NULL);
-		if (!(options->time = get_time()))
+		if (options->table.end || !(options->time = get_time()))
 			return (NULL);
 	}
 	return (NULL);

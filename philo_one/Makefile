@@ -6,7 +6,7 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/07 13:07:53 by mchardin          #+#    #+#              #
-#    Updated: 2020/10/25 19:17:26 by mchardin         ###   ########.fr        #
+#    Updated: 2020/10/27 09:29:44 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,16 +23,14 @@ SRCS		=	$(addprefix $(PREFIX), \
 								ft_utils.c \
 								ft_atoi.c \
 								ft_calloc.c \
-								ft_isnumber.c \
+								ft_isposnumber.c \
 								ft_itoa.c \
-								ft_putnbrphilo_fd.c \
-								ft_strlen.c \
-								ft_strncmp.c \
+								ft_putnbrphilo.c \
 								)
 
 OBJS		=	${SRCS:.c=.o}
 
-CC			=	clang-9
+CC			=	gcc
 
 CFLAGS		=	-pthread -Werror -Wextra -Wall -I ${INCLUDES}
 
@@ -47,7 +45,7 @@ ${NAME}:	${OBJS} ${INCL_FILES}
 			${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 
 run:		all
-			./$(NAME) 4 150 100 100 1
+			./$(NAME) 4 210 100 100
 
 clean:
 			${RM} ${OBJS}
