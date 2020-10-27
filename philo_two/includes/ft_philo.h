@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/27 13:37:40 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/27 09:07:47 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,12 @@
 # include <string.h>
 # include <pthread.h>
 # include <sys/time.h>
-# include <fcntl.h>
-# include <sys/stat.h>
-# include <semaphore.h>
 
 # define AC_FORK "has taken a fork\n"
 # define AC_EAT "is eating\n"
 # define AC_SLEEP "is sleeping\n"
 # define AC_THINK "is thinking\n"
 # define AC_DIE "died\n"
-# define SEM_END "sem_end"
-# define SEM_MSG "sem_msg"
-# define SEM_SEAT "sem_seat"
-# define SEM_FORK "sem_fork"
 
 typedef enum	e_msg
 {
@@ -49,13 +42,13 @@ typedef struct	s_table
 	int				still_eating;
 }				t_table;
 
-typedef struct  s_sem
+typedef struct  s_mutex
 {
-	sem_t		end;
-	sem_t		msg;
-	sem_t		seat;
-	sem_t		*fork;
-}				t_sem;
+	pthread_mutex_t		end;
+	pthread_mutex_t		msg;
+	pthread_mutex_t		seat;
+	pthread_mutex_t		*fork;
+}				t_mutex;
 
 typedef struct  s_options
 {
