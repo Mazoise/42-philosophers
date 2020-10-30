@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/27 11:41:51 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/30 17:24:55 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,11 @@ void		eat_sleep_think(t_options *options, t_perso *perso)
 	print_line(options, perso->id, MSG_FORK);
 	pthread_mutex_lock(&options->mutex.fork[perso->fork_id[1]]);
 	print_line(options, perso->id, MSG_FORK);
-	usleep(20);
-	perso->last_meal = options->time;
+	perso->t_last_meal = options->time;
 	print_line(options, perso->id, MSG_EAT);
-	usleep(options->t_eat);
+	perso->t_end_usleep = perso->t_last_meal + options->t_eat;
+	while (options->time < perso->t_end_usleep)
+		usleep(100);
 	if (!perso->meals_left)
 	{
 		pthread_mutex_lock(&options->mutex.msg);
@@ -41,7 +42,9 @@ void		eat_sleep_think(t_options *options, t_perso *perso)
 	pthread_mutex_unlock(&options->mutex.fork[perso->fork_id[0]]);
 	pthread_mutex_unlock(&options->mutex.fork[perso->fork_id[1]]);
 	print_line(options, perso->id, MSG_SLEEP);
-	usleep(options->t_sleep);
+	perso->t_end_usleep = options->time + options->t_sleep;
+	while (options->time < perso->t_end_usleep)
+		usleep(100);
 	print_line(options, perso->id, MSG_THINK);
 	usleep(20);
 }

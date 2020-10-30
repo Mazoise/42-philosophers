@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/27 13:37:40 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/30 17:06:57 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,12 @@
 # include <string.h>
 # include <pthread.h>
 # include <sys/time.h>
-# include <fcntl.h>
-# include <sys/stat.h>
-# include <semaphore.h>
 
 # define AC_FORK "has taken a fork\n"
 # define AC_EAT "is eating\n"
 # define AC_SLEEP "is sleeping\n"
 # define AC_THINK "is thinking\n"
 # define AC_DIE "died\n"
-# define SEM_END "sem_end"
-# define SEM_MSG "sem_msg"
-# define SEM_SEAT "sem_seat"
-# define SEM_FORK "sem_fork"
 
 typedef enum	e_msg
 {
@@ -49,13 +42,13 @@ typedef struct	s_table
 	int				still_eating;
 }				t_table;
 
-typedef struct  s_sem
+typedef struct  s_mutex
 {
-	sem_t		end;
-	sem_t		msg;
-	sem_t		seat;
-	sem_t		*fork;
-}				t_sem;
+	pthread_mutex_t		end;
+	pthread_mutex_t		msg;
+	pthread_mutex_t		seat;
+	pthread_mutex_t		*fork;
+}				t_mutex;
 
 typedef struct  s_options
 {
@@ -76,18 +69,19 @@ typedef struct	s_perso
 {
 	int				id;
 	int				fork_id[2];
-	long 			last_meal;
 	int				meals_left;
+	long 			t_last_meal;
+	long 			t_end_usleep;
 	t_options		*options;
 }				t_perso;
 
-typedef struct	s_print
-{
-	int				action;
-	int				id;
-	long 	time;
-	t_options		*options;
-}				t_print;
+// typedef struct	s_print
+// {
+// 	int				action;
+// 	int				id;
+// 	long 	time;
+// 	t_options		*options;
+// }				t_print;
 
 int		ft_isposnumber(const char *str);
 int		ft_atoi(const char *str);
@@ -95,8 +89,8 @@ void	ft_putnbrphilo(int n);
 char	*ft_itoa(int n);
 void	*ft_calloc(size_t count, size_t size);
 int		print_line(t_options *options, int id, int action);
-void	*print_thread(void *tmp);
-void	print_philo(char *s1, char *s2, char *s3, t_print *print);
+// void	*print_thread(void *tmp);
+// void	print_philo(char *s1, char *s2, char *s3, t_print *print);
 char	*msg_action(int action);
 void	eat_sleep_think(t_options *options, t_perso *perso);
 int		dead_philo(t_options *options, t_perso *perso, int t_death);

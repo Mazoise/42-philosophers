@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/27 11:47:24 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/10/30 17:06:29 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int		define_philo(t_options *options, t_perso *perso)
 		return (dead_philo(options, perso, options->t_die));
 	perso->fork_id[0] = perso->id;
 	perso->fork_id[1] = (perso->id + 1) % options->nb_philos;
-	perso->last_meal = options->start;
+	perso->t_last_meal = options->start;
 	perso->meals_left = options->nb_meals;
 	perso->options = options;
 	return (1);
@@ -89,7 +89,7 @@ void	*life_thread(void *tmp)
 	{
 		if (options->table.end)
 			return (NULL);
-		else if (options->time - perso.last_meal > options->t_die)
+		else if (options->time - perso.t_last_meal > options->t_die)
 		{
 			print_line(options, perso.id, MSG_DIE);
 			return (NULL);
