@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/30 17:06:57 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/11/04 14:16:14 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ typedef enum	e_msg
 
 typedef struct	s_table
 {
-	int				seat;
 	int				end;
 	int				still_eating;
 }				t_table;
@@ -46,7 +45,6 @@ typedef struct  s_mutex
 {
 	pthread_mutex_t		end;
 	pthread_mutex_t		msg;
-	pthread_mutex_t		seat;
 	pthread_mutex_t		*fork;
 }				t_mutex;
 
@@ -59,7 +57,6 @@ typedef struct  s_options
 	int				t_think;
 	int				nb_meals;
 	long 			start;
-	long 			time;
 	pthread_t		*philos;
 	t_table			table;
 	t_mutex			mutex;
@@ -70,32 +67,20 @@ typedef struct	s_perso
 	int				id;
 	int				fork_id[2];
 	int				meals_left;
-	long 			t_last_meal;
-	long 			t_end_usleep;
+	long 			t_death;
 	t_options		*options;
 }				t_perso;
-
-// typedef struct	s_print
-// {
-// 	int				action;
-// 	int				id;
-// 	long 	time;
-// 	t_options		*options;
-// }				t_print;
 
 int		ft_isposnumber(const char *str);
 int		ft_atoi(const char *str);
 void	ft_putnbrphilo(int n);
 char	*ft_itoa(int n);
 void	*ft_calloc(size_t count, size_t size);
+long 	get_time();
+void	usleep_opti(long t_end);
 int		print_line(t_options *options, int id, int action);
-// void	*print_thread(void *tmp);
-// void	print_philo(char *s1, char *s2, char *s3, t_print *print);
-char	*msg_action(int action);
 void	eat_sleep_think(t_options *options, t_perso *perso);
 int		dead_philo(t_options *options, t_perso *perso, int t_death);
-void	usleep_opti(int time);
-long 	get_time();
-void	*time_thread(void *tmp);
+void	clean_all(t_options *options, t_perso *perso);
 
 #endif

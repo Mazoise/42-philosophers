@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:35:23 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/27 11:43:04 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/11/04 14:16:03 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,25 +21,23 @@ long 	get_time()
 	return (now.tv_sec * 1000000 + now.tv_usec);
 }
 
-void	*time_thread(void *tmp)
+void	clean_all(t_options *options, t_perso *perso)
 {
-	t_options		*options;
+	int		i;
 
-	options = tmp;
-	while (1)
-	{
-		if (options->table.end || !(options->time = get_time()))
-			return (NULL);
-	}
-	return (NULL);
+	i = -1;
+	free(options->philos);
+	pthread_mutex_destroy(&options->mutex.end);
+	pthread_mutex_destroy(&options->mutex.msg);
+	while (++i < options->nb_philos)
+		pthread_mutex_destroy(&options->mutex.fork[i]);
+	free(options->mutex.fork);
+	free(perso);
+	return ;
 }
 
-// void		usleep_opti(int time)
-// {
-// 	int		time2;
-
-// 	time2 = 500 * time;
-// 	usleep(time2);
-// 	usleep(time2);
-// 	return ;
-// }
+void		usleep_opti(long t_end)
+{
+	while (get_time() < t_end)
+		usleep(50);
+}

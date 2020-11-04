@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/15 14:06:40 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/27 11:30:13 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/11/04 14:38:44 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int		msg_len(int action)
 
 // 	if (!(print = malloc(sizeof(t_print))))
 // 		return (0);
-// 	print->time = options->time;
+// 	print->time = get_time();
 // 	print->action = action;
 // 	print->options = options;
 // 	print->id = id;
@@ -84,10 +84,13 @@ int		print_line(t_options *options, int id, int action)
 {
 	int		timestamp;
 
-	timestamp = (options->time - options->start) / 1000;
+	timestamp = (get_time() - options->start) / 1000;
 	pthread_mutex_lock(&options->mutex.msg);
 	if (options->table.end)
+	{
+		pthread_mutex_unlock(&options->mutex.msg);
 		return (1); //useless now 
+	}
 	ft_putnbrphilo(timestamp);
 	ft_putnbrphilo(id + 1);
 	write(1, msg_action(action), msg_len(action));
