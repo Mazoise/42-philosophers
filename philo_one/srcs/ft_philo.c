@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2020/11/05 18:06:02 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/11/06 16:40:51 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int		fill_shared(t_shared *shared, int argc, char **argv)
 		shared->nb_meals = ft_atoi(argv[5]);
 	else
 		shared->nb_meals = -1;
-	shared->table.still_eating = shared->nb_philos;
+	shared->still_eating = shared->nb_philos;
 	pthread_mutex_init(&shared->mutex.end, NULL);
 	pthread_mutex_init(&shared->mutex.msg, NULL);
 	return (1);
@@ -51,6 +51,24 @@ void	define_philos(t_perso *perso, t_shared *shared)
 		perso[i].meals_left = shared->nb_meals;
 	}
 }
+void		*death_thread(void *tmp)
+{
+	t_perso			*perso;
+	t_shared		*shared;
+	int				i;
+
+	i = -1;
+	perso = tmp;
+	shared = perso->shared;
+	while (++i < shared->nb_philos)
+		if (pthread_create(&shared->philos[i], NULL, &life_thread, &perso[i]))
+			return (NULL);
+	usleep(shared->t_die / 2);
+	while (1)
+		if (end_of_philo(perso, shared))
+			return (NULL);
+	return (NULL);
+}
 
 int		run_threads(pthread_t *philos, t_shared *shared, t_perso *perso)
 {
@@ -59,15 +77,9 @@ int		run_threads(pthread_t *philos, t_shared *shared, t_perso *perso)
 	i = -1;
 	while (++i < shared->nb_philos)
 		pthread_mutex_init(&shared->mutex.fork[i], NULL);
-	i = -1;
-	if (!(shared->start = get_time()))
-		return (0);
-	while (++i < shared->nb_philos)
-		if (pthread_create(&philos[i], NULL, &life_thread, &perso[i]))
+	if (pthread_create(&philos[shared->nb_philos], NULL, &death_thread, perso))
 			return (0);
-	i = -1;
-	while (++i < shared->nb_philos)
-		pthread_join(philos[i], NULL);
+	pthread_join(philos[shared->nb_philos], NULL);
 	return (1);
 }
 
@@ -79,7 +91,7 @@ int		main(int argc, char **argv)
 	memset(&shared, 0, sizeof(shared));
 	if (argc < 5 || argc > 6 || !fill_shared(&shared, argc, argv))
 		return (0);
-	if (!(shared.philos = ft_calloc(shared.nb_philos * 2, sizeof(pthread_t)))
+	if (!(shared.philos = ft_calloc(shared.nb_philos + 1, sizeof(pthread_t)))
 		|| !(shared.mutex.fork =
 			ft_calloc(shared.nb_philos, sizeof(pthread_mutex_t)))
 		|| !(perso = ft_calloc(shared.nb_philos, sizeof(t_perso))))

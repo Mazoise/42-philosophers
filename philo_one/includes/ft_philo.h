@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2020/11/05 18:05:54 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/11/06 16:39:45 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,6 @@ typedef enum			e_msg
 	MSG_DIE
 }						t_msg;
 
-typedef struct			s_table
-{
-	int					end;
-	int					still_eating;
-}						t_table;
-
 typedef struct			s_mutex
 {
 	pthread_mutex_t		end;
@@ -58,7 +52,7 @@ typedef struct			s_shared
 	int					nb_meals;
 	long				start;
 	pthread_t			*philos;
-	t_table				table;
+	int					still_eating;
 	t_mutex				mutex;
 }						t_shared;
 
@@ -78,6 +72,7 @@ char					*ft_itoa(int n);
 void					*ft_calloc(size_t count, size_t size);
 long					get_time(void);
 void					usleep_opti(long t_end);
+int						end_of_philo(t_perso *perso, t_shared *shared);
 int						print_line(t_shared *shared, int id, int action);
 void					*life_thread(void *tmp);
 void					clean_all(t_shared *shared, t_perso *perso);

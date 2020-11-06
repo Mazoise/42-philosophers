@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/15 14:06:40 by mchardin          #+#    #+#             */
-/*   Updated: 2020/11/05 18:04:18 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/11/06 16:40:53 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,16 +46,13 @@ int		print_line(t_shared *shared, int id, int action)
 
 	timestamp = (get_time() - shared->start) / 1000;
 	pthread_mutex_lock(&shared->mutex.msg);
-	if (shared->table.end)
-	{
-		pthread_mutex_unlock(&shared->mutex.msg);
-		return (1);
-	}
+	if (!shared->still_eating && action != MSG_DIE)
+		while (1)
+			;
 	ft_putnbrphilo(timestamp);
 	ft_putnbrphilo(id + 1);
 	write(1, msg_action(action), msg_len(action));
-	if (action == MSG_DIE)
-		shared->table.end = 1;
-	pthread_mutex_unlock(&shared->mutex.msg);
+	if (action != MSG_DIE)
+		pthread_mutex_unlock(&shared->mutex.msg);
 	return (1);
 }

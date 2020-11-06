@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2020/11/05 18:06:20 by mchardin         ###   ########.fr       */
+/*   Updated: 2020/11/06 16:40:28 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,7 @@ void		eat_sleep_think(t_shared *shared, t_perso *perso)
 	if (!perso->meals_left)
 	{
 		pthread_mutex_lock(&shared->mutex.msg);
-		shared->table.still_eating--;
-		if (!shared->table.still_eating)
-			shared->table.end = 1;
+		shared->still_eating--;
 		pthread_mutex_unlock(&shared->mutex.msg);
 	}
 	pthread_mutex_unlock(&shared->mutex.fork[perso->fork_id[0]]);
@@ -43,7 +41,7 @@ void		eat_sleep_think(t_shared *shared, t_perso *perso)
 	print_line(shared, perso->id, MSG_THINK);
 }
 
-void		*action_thread(void *tmp)
+void		*life_thread(void *tmp)
 {
 	t_perso			*perso;
 	t_shared		*shared;
@@ -67,29 +65,5 @@ void		*action_thread(void *tmp)
 		eat_sleep_think(shared, perso);
 	while (1)
 		;
-	return (NULL);
-}
-
-void		*life_thread(void *tmp)
-{
-	t_shared		*shared;
-	t_perso			*perso;
-
-	perso = tmp;
-	shared = perso->shared;
-	if (pthread_create(&shared->philos[perso->id + shared->nb_philos],
-	NULL, &action_thread, perso))
-		return (NULL);
-	usleep(shared->t_die / 2);
-	while (1)
-	{
-		if (shared->table.end)
-			return (NULL);
-		else if (get_time() > perso->t_death)
-		{
-			print_line(shared, perso->id, MSG_DIE);
-			return (NULL);
-		}
-	}
 	return (NULL);
 }
