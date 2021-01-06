@@ -6,14 +6,15 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/09 15:25:40 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/27 09:07:19 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/01/06 16:59:20 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <unistd.h>
 #include "ft_philo.h"
 
-void	ft_putnbrphilo(int n)
+void
+	ft_putnbrphilo(int n)
 {
 	char	nb[11];
 	int		i;

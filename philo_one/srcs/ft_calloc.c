@@ -5,21 +5,23 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/10/10 12:40:10 by mchardin          #+#    #+#             */
-/*   Updated: 2020/10/05 18:52:02 by mchardin         ###   ########.fr       */
+/*   Created: 2021/01/06 16:49:11 by mchardin          #+#    #+#             */
+/*   Updated: 2021/01/06 18:19:55 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include <string.h>
 
-void	*ft_calloc(size_t count, size_t size)
+void
+	*ft_calloc(size_t count, size_t size)
 {
 	unsigned char		*str;
 	size_t				i;
 
 	i = 0;
-	if (!(str = malloc(count * size)))
+	str = malloc(count * size);
+	if (!str)
 		return (0);
 	while (i < size * count)
 	{

@@ -6,13 +6,14 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/15 14:06:40 by mchardin          #+#    #+#             */
-/*   Updated: 2020/11/06 16:40:53 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/01/06 16:59:00 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_philo.h"
 
-char	*msg_action(int action)
+char
+	*msg_action(int action)
 {
 	if (action == MSG_FORK)
 		return (AC_FORK);
@@ -27,7 +28,8 @@ char	*msg_action(int action)
 	return (NULL);
 }
 
-int		msg_len(int action)
+int
+	msg_len(int action)
 {
 	if (action == MSG_FORK)
 		return (17);
@@ -40,7 +42,8 @@ int		msg_len(int action)
 	return (0);
 }
 
-int		print_line(t_shared *shared, int id, int action)
+int
+	print_line(t_shared *shared, int id, int action)
 {
 	int		timestamp;
 
