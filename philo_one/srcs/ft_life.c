@@ -6,19 +6,11 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/01/06 17:11:49 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/01 17:00:23 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_philo.h"
-
-int
-	dead_philo(t_shared *shared, t_perso *perso, int t_death)
-{
-	usleep_opti(get_time() + t_death);
-	print_line(shared, perso->id, MSG_DIE);
-	return (0);
-}
 
 void
 	eat_sleep_think(t_shared *shared, t_perso *perso)
@@ -55,16 +47,16 @@ void
 	if (shared->nb_philos == 1)
 	{
 		print_line(shared, perso->id, MSG_FORK);
-		while (1)
+		while (!shared->stop)
 			;
 	}
 	if (perso->id % 2)
 		usleep(shared->t_eat / 2);
 	else if (perso->id == shared->nb_philos - 1)
 		usleep((3 * shared->t_eat) / 2);
-	while (perso->meals_left < 0 ? 1 : perso->meals_left--)
+	while (!shared->stop && perso->meals_left--)
 		eat_sleep_think(shared, perso);
-	while (1)
+	while (!shared->stop)
 		;
 	return (NULL);
 }

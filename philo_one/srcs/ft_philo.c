@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2021/01/06 18:03:08 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/01 16:25:30 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int
 			return (0);
 	}
 	shared->nb_philos = ft_atoi(argv[1]);
-	 if (!shared->nb_philos)
+	if (!shared->nb_philos)
 		return (0);
 	shared->t_die = ft_atoi(argv[2]) * 1000;
 	shared->t_eat = ft_atoi(argv[3]) * 1000;
@@ -77,9 +77,9 @@ int
 	shared->start = get_time();
 	while (++i < shared->nb_philos)
 		if (pthread_create(&shared->philos[i], NULL, &life_thread, &perso[i]))
-			return (0);
+			return (i);
 	death_check(shared, perso);
-	return (1);
+	return (0);
 }
 
 int
@@ -87,6 +87,7 @@ int
 {
 	t_shared		shared;
 	t_perso			*perso;
+	int				threads;
 
 	memset(&shared, 0, sizeof(shared));
 	if (argc < 5 || argc > 6 || !fill_shared(&shared, argc, argv))
@@ -97,9 +98,12 @@ int
 	if (!shared.mutex.fork || !shared.philos || !perso)
 		return (0);
 	define_philos(perso, &shared);
-	if (!run_threads(&shared, perso))
+	if ((threads = run_threads(&shared, perso)))
+	{
+		clean_all(&shared, perso, threads);
 		return (0);
-	usleep(10000);
-	clean_all(&shared, perso);
+	}
+	clean_all(&shared, perso, shared.nb_philos);
+	return (0);
 	return (0);
 }

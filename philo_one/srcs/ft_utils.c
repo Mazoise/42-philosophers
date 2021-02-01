@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:35:23 by mchardin          #+#    #+#             */
-/*   Updated: 2021/01/06 16:58:19 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/01 17:01:45 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int
 	{
 		if (get_time() > perso[i].t_death)
 		{
-			print_line(shared, perso[i].id, MSG_DIE);
+			print_death(shared, perso[i].id);
 			return (1);
 		}
 	}
@@ -42,11 +42,14 @@ int
 }
 
 void
-	clean_all(t_shared *shared, t_perso *perso)
+	clean_all(t_shared *shared, t_perso *perso, int threads)
 {
 	int		i;
 
+	shared->stop = 1;
 	i = -1;
+	while (++i < threads)
+		pthread_join(shared->philos[i], NULL);
 	free(shared->philos);
 	pthread_mutex_destroy(&shared->mutex.end);
 	pthread_mutex_destroy(&shared->mutex.msg);
