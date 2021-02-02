@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 12:31:58 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 15:48:09 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,9 @@ int
 	int		i;
 
 	i = -1;
-	shared->sem.forks = sem_open(SEM_FORKS, O_CREAT, 00600, shared->nb_philos);
+	sem_unlink(SEM_FORKS);
+	sem_unlink(SEM_MSG);
+	shared->sem.forks = sem_open(SEM_FORKS, O_CREAT, 00600, shared->nb_philos / 2);
 	if (shared->sem.forks == SEM_FAILED)
 		return (0);
 	shared->sem.msg = sem_open(SEM_MSG, O_CREAT, 00600, 1);
@@ -102,9 +104,9 @@ int
 		return (1);
 	if ((threads = run_threads(&shared, perso)) >= 0)
 	{
-		clean_all(&shared, perso, threads);
+		clean_all(&shared, perso, threads - 1);
 		return (1);
 	}
-	clean_all(&shared, perso, shared.nb_philos + 1);
+	clean_all(&shared, perso, shared.nb_philos);
 	return (0);
 }

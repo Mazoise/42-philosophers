@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 12:21:28 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 15:48:33 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ void
 {
 	sem_wait(shared->sem.forks);
 	print_line(shared, perso->id, MSG_FORK);
-	sem_wait(shared->sem.forks);
 	print_line(shared, perso->id, MSG_FORK);
 	perso->t_death = get_time() + shared->t_die;
 	print_line(shared, perso->id, MSG_EAT);
@@ -28,7 +27,6 @@ void
 		shared->still_eating--;
 		sem_post(shared->sem.msg);
 	}
-	sem_post(shared->sem.forks);
 	sem_post(shared->sem.forks);
 	print_line(shared, perso->id, MSG_SLEEP);
 	usleep_opti(get_time() + shared->t_sleep);

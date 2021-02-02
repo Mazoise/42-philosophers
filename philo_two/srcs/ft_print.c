@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/15 14:06:40 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 12:23:55 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 15:22:45 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,13 @@ void
 	print_line(t_shared *shared, int id, int action)
 {
 	int		timestamp;
+	// int		sem_value1;
+	// int		sem_value2;
 
 	timestamp = (get_time() - shared->start) / 1000;
+	// sem_getvalue(shared->sem.forks, &sem_value1);
+	// sem_getvalue(shared->sem.msg, &sem_value2);
+	// printf("FORKS : %d, MSG: %d", sem_value1, sem_value2); //W
 	sem_wait(shared->sem.msg);
 	if (!shared->stop && shared->still_eating)
 	{
@@ -60,8 +65,8 @@ void
 {
 	int		timestamp;
 
-	sem_wait(shared->sem.msg);
 	timestamp = (get_time() - shared->start) / 1000;
+	sem_wait(shared->sem.msg);
 	shared->stop = 1;
 	ft_putnbrphilo(timestamp);
 	ft_putnbrphilo(id + 1);

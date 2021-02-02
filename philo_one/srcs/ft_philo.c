@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 11:34:42 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 16:52:01 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ int
 	define_philos(perso, &shared);
 	if ((threads = run_threads(&shared, perso)) >= 0)
 	{
-		clean_all(&shared, perso, threads);
+		clean_all(&shared, perso, threads - 1);
 		return (1);
 	}
 	clean_all(&shared, perso, shared.nb_philos);
