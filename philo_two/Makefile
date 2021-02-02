@@ -6,7 +6,7 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/07 13:07:53 by mchardin          #+#    #+#              #
-#    Updated: 2021/02/02 11:07:30 by mchardin         ###   ########.fr        #
+#    Updated: 2021/02/02 12:22:08 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,7 +33,7 @@ CC			=	clang-9
 
 CFLAGS		=	-pthread -Werror -Wextra -Wall -I ${INCLUDES}
 
-NAME 		=	philo_one
+NAME 		=	philo_two
 
 RM			=	rm -f
 
@@ -44,7 +44,7 @@ ${NAME}:	${OBJS} ${INCL_FILES}
 			${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 
 run:		all
-			./$(NAME) 1 5060 150 150
+			./$(NAME) 4 360 150 150
 
 clean:
 			${RM} ${OBJS}

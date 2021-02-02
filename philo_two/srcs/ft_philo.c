@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 11:34:42 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 12:31:58 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,24 +34,31 @@ int
 	else
 		shared->nb_meals = -1;
 	shared->still_eating = shared->nb_philos;
-	pthread_mutex_init(&shared->mutex.msg, NULL);
 	return (1);
 }
 
-void
+int
 	define_philos(t_perso *perso, t_shared *shared)
 {
 	int		i;
 
 	i = -1;
+	shared->sem.forks = sem_open(SEM_FORKS, O_CREAT, 00600, shared->nb_philos);
+	if (shared->sem.forks == SEM_FAILED)
+		return (0);
+	shared->sem.msg = sem_open(SEM_MSG, O_CREAT, 00600, 1);
+	if (shared->sem.msg == SEM_FAILED)
+	{
+		sem_close(shared->sem.forks);
+		return (0);
+	}
 	while (++i < shared->nb_philos)
 	{
 		perso[i].shared = shared;
 		perso[i].id = i;
-		perso[i].fork_id[0] = i;
-		perso[i].fork_id[1] = (i + 1) % shared->nb_philos;
 		perso[i].meals_left = shared->nb_meals;
 	}
+	return (1);
 }
 
 void
@@ -69,16 +76,10 @@ int
 	int		i;
 
 	i = -1;
-	while (++i < shared->nb_philos)
-		pthread_mutex_init(&shared->mutex.fork[i], NULL);
-	i = -1;
 	shared->start = get_time();
 	while (++i < shared->nb_philos)
 		if (pthread_create(&shared->philos[i], NULL, &life_thread, &perso[i]))
-		{
-			shared->stop = 1;
 			return (i);
-		}
 	death_check(shared, perso);
 	return (-1);
 }
@@ -93,17 +94,17 @@ int
 	memset(&shared, 0, sizeof(shared));
 	if (argc < 5 || argc > 6 || !fill_shared(&shared, argc, argv))
 		return (1);
-	shared.mutex.fork = ft_calloc(shared.nb_philos, sizeof(pthread_mutex_t));
 	shared.philos = ft_calloc(shared.nb_philos, sizeof(pthread_t));
 	perso = ft_calloc(shared.nb_philos, sizeof(t_perso));
-	if (!shared.mutex.fork || !shared.philos || !perso)
+	if (!shared.philos || !perso)
 		return (1);
-	define_philos(perso, &shared);
+	if (!define_philos(perso, &shared))
+		return (1);
 	if ((threads = run_threads(&shared, perso)) >= 0)
 	{
 		clean_all(&shared, perso, threads);
 		return (1);
 	}
-	clean_all(&shared, perso, shared.nb_philos);
+	clean_all(&shared, perso, shared.nb_philos + 1);
 	return (0);
 }

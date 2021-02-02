@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/15 14:06:40 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 10:58:59 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 12:23:55 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,15 @@ void
 {
 	int		timestamp;
 
-	pthread_mutex_lock(&shared->mutex.msg);
 	timestamp = (get_time() - shared->start) / 1000;
+	sem_wait(shared->sem.msg);
 	if (!shared->stop && shared->still_eating)
 	{
 		ft_putnbrphilo(timestamp);
 		ft_putnbrphilo(id + 1);
 		write(1, msg_action(action), msg_len(action));
 	}
-	pthread_mutex_unlock(&shared->mutex.msg);
+	sem_post(shared->sem.msg);
 	return ;
 }
 
@@ -60,12 +60,12 @@ void
 {
 	int		timestamp;
 
-	pthread_mutex_lock(&shared->mutex.msg);
+	sem_wait(shared->sem.msg);
 	timestamp = (get_time() - shared->start) / 1000;
 	shared->stop = 1;
 	ft_putnbrphilo(timestamp);
 	ft_putnbrphilo(id + 1);
 	write(1, AC_DIE, 5);
-	pthread_mutex_unlock(&shared->mutex.msg);
+	sem_post(shared->sem.msg);
 	return ;
 }

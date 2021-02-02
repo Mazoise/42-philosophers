@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 11:14:26 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 12:33:16 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 # include <unistd.h>
 # include <string.h>
 # include <pthread.h>
+# include <fcntl.h>
+# include <semaphore.h>
 # include <sys/time.h>
 
 # define AC_FORK "has taken a fork\n"
@@ -25,6 +27,9 @@
 # define AC_SLEEP "is sleeping\n"
 # define AC_THINK "is thinking\n"
 # define AC_DIE "died\n"
+
+# define SEM_FORKS "forks_sem_philo_two_mchardin"
+# define SEM_MSG "msg_sem_philo_two_mchardin"
 
 typedef enum			e_msg
 {
@@ -35,11 +40,11 @@ typedef enum			e_msg
 	MSG_DIE
 }						t_msg;
 
-typedef struct			s_mutex
+typedef struct			s_sem
 {
-	pthread_mutex_t		msg;
-	pthread_mutex_t		*fork;
-}						t_mutex;
+	sem_t				*msg;
+	sem_t				*forks;
+}						t_sem;
 
 typedef struct			s_shared
 {
@@ -53,13 +58,12 @@ typedef struct			s_shared
 	long				start;
 	int					stop;
 	pthread_t			*philos;
-	t_mutex				mutex;
+	t_sem				sem;
 }						t_shared;
 
 typedef struct			s_perso
 {
 	int					id;
-	int					fork_id[2];
 	int					meals_left;
 	long				t_death;
 	t_shared			*shared;
