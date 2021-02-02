@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 16:56:42 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 20:01:07 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ int
 	i = -1;
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_MSG);
+	sem_unlink(SEM_STOP);
 	if ((shared->sem.forks = sem_open(SEM_FORKS, O_CREAT, 00600,
 		shared->nb_philos / 2)) == SEM_FAILED)
 		return (0);
@@ -52,6 +53,13 @@ int
 	if (shared->sem.msg == SEM_FAILED)
 	{
 		sem_close(shared->sem.forks);
+		return (0);
+	}
+	shared->sem.msg = sem_open(SEM_STOP, O_CREAT, 00600, 0);
+	if (shared->sem.stop == SEM_FAILED)
+	{
+		sem_close(shared->sem.forks);
+		sem_close(shared->sem.msg);
 		return (0);
 	}
 	while (++i < shared->nb_philos)
@@ -66,23 +74,43 @@ int
 void
 	death_check(t_shared *shared, t_perso *perso)
 {
+	int		i;
+
+	i = -1;
 	usleep(shared->t_die / 2);
-	while (!end_of_philo(perso, shared))
-		;
+	while (1)
+	{
+		if (get_time() > perso[i].t_death)
+		{
+			print_death(shared, perso.id);
+			while (++i < shared->nb_philos)
+				sem_post(shared->sem.stop);
+			return ;
+		}
+	}
 	return ;
 }
 
 int
-	run_threads(t_shared *shared, t_perso *perso)
+	run_processes(t_shared *shared, t_perso *perso)
 {
 	int		i;
 
 	i = -1;
 	shared->start = get_time();
 	while (++i < shared->nb_philos)
-		if (pthread_create(&shared->philos[i], NULL, &life_thread, &perso[i]))
+	{
+		shared->philos[i] = fork();
+		if (shared->philos[i] == -1)
 			return (i);
-	death_check(shared, perso);
+		else if (shared->philos[i] == 0)
+			if (pthread_create(&shared->philos[i], NULL, &life_thread, &perso[i]))
+				return (i);
+			death_check(shared, &perso[i]);
+	}
+	i = -1;
+	while (++i < shared->nb_philos)
+		sem_wait(shared->sem.stop);
 	return (-1);
 }
 
@@ -96,7 +124,7 @@ int
 	memset(&shared, 0, sizeof(shared));
 	if (argc < 5 || argc > 6 || !fill_shared(&shared, argc, argv))
 		return (1);
-	shared.philos = ft_calloc(shared.nb_philos, sizeof(pthread_t));
+	shared.philos = ft_calloc(shared.nb_philos, sizeof(pid_t));
 	perso = ft_calloc(shared.nb_philos, sizeof(t_perso));
 	if (!shared.philos || !perso)
 		return (1);

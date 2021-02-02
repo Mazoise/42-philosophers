@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 17:12:26 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 18:58:52 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void
 }
 
 void
-	*life_thread(void *tmp)
+	life_thread(void *tmp)
 {
 	t_perso			*perso;
 	t_shared		*shared;
@@ -43,7 +43,7 @@ void
 		print_line(shared, perso->id, MSG_FORK);
 		while (!shared->stop)
 			;
-		return (NULL);
+		exit(0);
 	}
 	if (perso->id % 2)
 		usleep(shared->t_eat / 2);
@@ -53,5 +53,5 @@ void
 		eat_sleep_think(shared, perso);
 	while (!shared->stop)
 		;
-	return (NULL);
+	exit(0);
 }

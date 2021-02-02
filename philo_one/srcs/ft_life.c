@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/01 17:00:23 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 17:13:38 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,7 @@ void
 	print_line(shared, perso->id, MSG_EAT);
 	usleep_opti(get_time() + shared->t_eat);
 	if (!perso->meals_left)
-	{
-		pthread_mutex_lock(&shared->mutex.msg);
 		shared->still_eating--;
-		pthread_mutex_unlock(&shared->mutex.msg);
-	}
 	pthread_mutex_unlock(&shared->mutex.fork[perso->fork_id[0]]);
 	pthread_mutex_unlock(&shared->mutex.fork[perso->fork_id[1]]);
 	print_line(shared, perso->id, MSG_SLEEP);

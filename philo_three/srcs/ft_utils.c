@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:35:23 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 18:07:23 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/02 19:01:27 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,11 @@ void
 	int		i;
 
 	i = -1;
-	if (threads > 0)
-		while (++i < threads)
-			pthread_join(shared->philos[i], NULL);
+	usleep(10000);
+	(void)threads;
+	// if (threads > 0)
+	// 	while (++i < threads)
+	// 		waitpid(-1, NULL, 0);
 	free(shared->philos);
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_MSG);
