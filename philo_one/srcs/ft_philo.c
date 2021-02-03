@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 16:52:01 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 12:57:15 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@ int
 	shared->nb_philos = ft_atoi(argv[1]);
 	if (!shared->nb_philos)
 		return (0);
+	i = -1;
+	while (argv[1][++i])
+		shared->len_nb_philos++;
 	shared->t_die = ft_atoi(argv[2]) * 1000;
 	shared->t_eat = ft_atoi(argv[3]) * 1000;
 	shared->t_sleep = ft_atoi(argv[4]) * 1000;

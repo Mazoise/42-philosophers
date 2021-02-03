@@ -6,7 +6,7 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/07 13:07:53 by mchardin          #+#    #+#              #
-#    Updated: 2021/02/02 17:48:20 by mchardin         ###   ########.fr        #
+#    Updated: 2021/02/03 12:55:54 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ SRCS		=	$(addprefix $(PREFIX), \
 								ft_atoi.c \
 								ft_calloc.c \
 								ft_isposnumber.c \
-								ft_putnbrphilo.c \
+								ft_strcpyphilo.c \
 								)
 
 OBJS		=	${SRCS:.c=.o}

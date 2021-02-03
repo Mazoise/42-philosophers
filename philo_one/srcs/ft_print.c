@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/15 14:06:40 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 10:58:59 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 12:52:24 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,34 +23,45 @@ char
 		return (AC_THINK);
 	else if (action == MSG_EAT)
 		return (AC_EAT);
+	else if (action == MSG_DIE)
+		return (AC_DIE);
 	return (NULL);
 }
 
-int
-	msg_len(int action)
+void
+	print_line(int timestamp, int id, int action, int philo_len)
 {
-	if (action == MSG_FORK)
-		return (17);
-	else if (action == MSG_SLEEP || action == MSG_THINK)
-		return (12);
-	else if (action == MSG_EAT)
-		return (10);
-	return (0);
+	char		line[39];
+	int			end;
+	int			i;
+
+	i = 12 + philo_len;
+	end = i;
+	line[i] = ' ';
+	while (--i >= 12)
+	{
+		line[i] = '0' + id % 10;
+		id = id / 10;
+	}
+	line[i] = ' ';
+	while (--i >= 0)
+	{
+		line[i] = '0' + timestamp % 10;
+		timestamp = timestamp / 10;
+	}
+	end += ft_strcpyphilo(&line[end + 1], msg_action(action));
+	write(1, line, end + 1);
 }
 
 void
-	print_line(t_shared *shared, int id, int action)
+	print_event(t_shared *shared, int id, int action)
 {
 	int		timestamp;
 
 	pthread_mutex_lock(&shared->mutex.msg);
 	timestamp = (get_time() - shared->start) / 1000;
 	if (!shared->stop && shared->still_eating)
-	{
-		ft_putnbrphilo(timestamp);
-		ft_putnbrphilo(id + 1);
-		write(1, msg_action(action), msg_len(action));
-	}
+		print_line(timestamp, id + 1, action, shared->len_nb_philos);
 	pthread_mutex_unlock(&shared->mutex.msg);
 	return ;
 }
@@ -63,9 +74,7 @@ void
 	pthread_mutex_lock(&shared->mutex.msg);
 	timestamp = (get_time() - shared->start) / 1000;
 	shared->stop = 1;
-	ft_putnbrphilo(timestamp);
-	ft_putnbrphilo(id + 1);
-	write(1, AC_DIE, 5);
+	print_line(timestamp, id + 1, MSG_DIE, shared->len_nb_philos);
 	pthread_mutex_unlock(&shared->mutex.msg);
 	return ;
 }

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 18:58:52 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 11:51:54 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,21 @@ void
 	eat_sleep_think(t_shared *shared, t_perso *perso)
 {
 	sem_wait(shared->sem.forks);
-	print_line(shared, perso->id, MSG_FORK);
-	print_line(shared, perso->id, MSG_FORK);
+	print_event(shared, perso->id, MSG_FORK);
+	print_event(shared, perso->id, MSG_FORK);
 	perso->t_death = get_time() + shared->t_die;
-	print_line(shared, perso->id, MSG_EAT);
+	print_event(shared, perso->id, MSG_EAT);
 	usleep_opti(get_time() + shared->t_eat);
 	if (!perso->meals_left)
-		shared->still_eating--;
+		sem_post(shared->sem.stop);
 	sem_post(shared->sem.forks);
-	print_line(shared, perso->id, MSG_SLEEP);
+	print_event(shared, perso->id, MSG_SLEEP);
 	usleep_opti(get_time() + shared->t_sleep);
-	print_line(shared, perso->id, MSG_THINK);
+	print_event(shared, perso->id, MSG_THINK);
 }
 
 void
-	life_thread(void *tmp)
+	*life_thread(void *tmp)
 {
 	t_perso			*perso;
 	t_shared		*shared;
@@ -40,18 +40,18 @@ void
 	perso->t_death = shared->start + shared->t_die;
 	if (shared->nb_philos == 1)
 	{
-		print_line(shared, perso->id, MSG_FORK);
-		while (!shared->stop)
+		print_event(shared, perso->id, MSG_FORK);
+		while (1)
 			;
-		exit(0);
+		return (NULL);
 	}
 	if (perso->id % 2)
 		usleep(shared->t_eat / 2);
 	else if (perso->id == shared->nb_philos - 1)
 		usleep((3 * shared->t_eat) / 2);
-	while (!shared->stop && perso->meals_left--)
+	while (perso->meals_left--)
 		eat_sleep_think(shared, perso);
-	while (!shared->stop)
+	while (1)
 		;
-	exit(0);
+	return (NULL);
 }

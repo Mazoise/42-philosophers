@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 19:52:46 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 12:19:01 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <unistd.h>
 # include <string.h>
 # include <fcntl.h>
+# include <pthread.h>
 # include <semaphore.h>
 # include <sys/time.h>
 # include <sys/stat.h> 
@@ -53,12 +54,14 @@ typedef struct			s_sem
 typedef struct			s_shared
 {
 	int					nb_philos;
+	int					len_nb_philos;
 	int					t_die;
 	int					t_eat;
 	int					t_sleep;
 	int					t_think;
 	int					nb_meals;
 	long				start;
+	int					stop;
 	pid_t				*philos;
 	t_sem				sem;
 }						t_shared;
@@ -72,8 +75,8 @@ typedef struct			s_perso
 }						t_perso;
 
 int						ft_isposnumber(const char *str);
+size_t					ft_strcpyphilo(char *dst, const char *src);
 int						ft_atoi(const char *str);
-void					ft_putnbrphilo(int n);
 char					*ft_itoa_pos(int n);
 void					*ft_calloc(size_t count, size_t size);
 int						ft_acalloc(void **dest, size_t count, size_t size);
@@ -81,9 +84,9 @@ int						ft_amalloc(void **dest, size_t size);
 long					get_time(void);
 void					usleep_opti(long t_end);
 int						end_of_philo(t_perso *perso, t_shared *shared);
-void					print_line(t_shared *shared, int id, int action);
+void					print_event(t_shared *shared, int id, int action);
 void					print_death(t_shared *shared, int id);
-void					life_thread(void *tmp);
+void					*life_thread(void *tmp);
 void					clean_all(t_shared *shared, t_perso *perso, int thr);
 
 #endif

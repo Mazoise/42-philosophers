@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 11:14:26 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 12:56:32 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ typedef struct			s_mutex
 typedef struct			s_shared
 {
 	int					nb_philos;
+	int					len_nb_philos;
 	int					t_die;
 	int					t_eat;
 	int					t_sleep;
@@ -67,7 +68,7 @@ typedef struct			s_perso
 
 int						ft_isposnumber(const char *str);
 int						ft_atoi(const char *str);
-void					ft_putnbrphilo(int n);
+size_t					ft_strcpyphilo(char *dst, const char *src);
 char					*ft_itoa_pos(int n);
 void					*ft_calloc(size_t count, size_t size);
 int						ft_acalloc(void **dest, size_t count, size_t size);
@@ -75,7 +76,7 @@ int						ft_amalloc(void **dest, size_t size);
 long					get_time(void);
 void					usleep_opti(long t_end);
 int						end_of_philo(t_perso *perso, t_shared *shared);
-void					print_line(t_shared *shared, int id, int action);
+void					print_event(t_shared *shared, int id, int action);
 void					print_death(t_shared *shared, int id);
 void					*life_thread(void *tmp);
 void					clean_all(t_shared *shared, t_perso *perso, int thr);

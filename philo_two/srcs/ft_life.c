@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/16 14:32:58 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/02 17:12:26 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 12:58:23 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,17 @@ void
 	eat_sleep_think(t_shared *shared, t_perso *perso)
 {
 	sem_wait(shared->sem.forks);
-	print_line(shared, perso->id, MSG_FORK);
-	print_line(shared, perso->id, MSG_FORK);
+	print_event(shared, perso->id, MSG_FORK);
+	print_event(shared, perso->id, MSG_FORK);
 	perso->t_death = get_time() + shared->t_die;
-	print_line(shared, perso->id, MSG_EAT);
+	print_event(shared, perso->id, MSG_EAT);
 	usleep_opti(get_time() + shared->t_eat);
 	if (!perso->meals_left)
 		shared->still_eating--;
 	sem_post(shared->sem.forks);
-	print_line(shared, perso->id, MSG_SLEEP);
+	print_event(shared, perso->id, MSG_SLEEP);
 	usleep_opti(get_time() + shared->t_sleep);
-	print_line(shared, perso->id, MSG_THINK);
+	print_event(shared, perso->id, MSG_THINK);
 }
 
 void
@@ -40,7 +40,7 @@ void
 	perso->t_death = shared->start + shared->t_die;
 	if (shared->nb_philos == 1)
 	{
-		print_line(shared, perso->id, MSG_FORK);
+		print_event(shared, perso->id, MSG_FORK);
 		while (!shared->stop)
 			;
 		return (NULL);
