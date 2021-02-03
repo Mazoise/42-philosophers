@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/03 12:19:01 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 14:13:53 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <pthread.h>
 # include <semaphore.h>
 # include <sys/time.h>
-# include <sys/stat.h> 
+# include <sys/stat.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 
@@ -83,6 +83,7 @@ int						ft_acalloc(void **dest, size_t count, size_t size);
 int						ft_amalloc(void **dest, size_t size);
 long					get_time(void);
 void					usleep_opti(long t_end);
+int						semaphore_init(t_shared *shared);
 int						end_of_philo(t_perso *perso, t_shared *shared);
 void					print_event(t_shared *shared, int id, int action);
 void					print_death(t_shared *shared, int id);

@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:13:32 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/03 12:15:11 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 14:14:25 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,25 +45,8 @@ int
 	int		i;
 
 	i = -1;
-	sem_unlink(SEM_FORKS);
-	sem_unlink(SEM_MSG);
-	sem_unlink(SEM_STOP);
-	if ((shared->sem.forks = sem_open(SEM_FORKS, O_CREAT, 00600,
-		shared->nb_philos / 2)) == SEM_FAILED)
+	if (!semaphore_init(shared))
 		return (0);
-	shared->sem.msg = sem_open(SEM_MSG, O_CREAT, 00600, 1);
-	if (shared->sem.msg == SEM_FAILED)
-	{
-		sem_close(shared->sem.forks);
-		return (0);
-	}
-	shared->sem.stop = sem_open(SEM_STOP, O_CREAT, 00600, 0);
-	if (shared->sem.stop == SEM_FAILED)
-	{
-		sem_close(shared->sem.forks);
-		sem_close(shared->sem.msg);
-		return (0);
-	}
 	while (++i < shared->nb_philos)
 	{
 		perso[i].shared = shared;
@@ -104,7 +87,7 @@ int
 			if (pthread_create(&philo[i], NULL, &life_thread, &perso[i]))
 				return (i);
 			death_check(shared, &perso[i]);
-			exit (0);
+			exit(0);
 		}
 	}
 	i = -1;

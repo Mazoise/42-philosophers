@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/15 14:06:40 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/03 12:53:52 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 14:07:11 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,8 @@ void
 {
 	int		timestamp;
 
-	timestamp = (get_time() - shared->start) / 1000;
 	sem_wait(shared->sem.msg);
+	timestamp = (get_time() - shared->start) / 1000;
 	if (!shared->stop && shared->still_eating)
 		print_line(timestamp, id + 1, action, shared->len_nb_philos);
 	sem_post(shared->sem.msg);
@@ -71,8 +71,8 @@ void
 {
 	int		timestamp;
 
-	timestamp = (get_time() - shared->start) / 1000;
 	sem_wait(shared->sem.msg);
+	timestamp = (get_time() - shared->start) / 1000;
 	shared->stop = 1;
 	print_line(timestamp, id + 1, MSG_DIE, shared->len_nb_philos);
 	sem_post(shared->sem.msg);

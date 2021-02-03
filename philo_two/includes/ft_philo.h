@@ -6,7 +6,7 @@
 /*   By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/07 13:07:46 by mchardin          #+#    #+#             */
-/*   Updated: 2021/02/03 12:56:17 by mchardin         ###   ########.fr       */
+/*   Updated: 2021/02/03 14:14:37 by mchardin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <fcntl.h>
 # include <semaphore.h>
 # include <sys/time.h>
-# include <sys/stat.h> 
+# include <sys/stat.h>
 
 # define AC_FORK "has taken a fork\n"
 # define AC_EAT "is eating\n"
