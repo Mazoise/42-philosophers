@@ -6,15 +6,13 @@
 #    By: mchardin <mchardin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/07/07 13:07:53 by mchardin          #+#    #+#              #
-#    Updated: 2021/02/03 14:07:55 by mchardin         ###   ########.fr        #
+#    Updated: 2021/02/03 15:20:40 by mchardin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 PREFIX		=	./srcs/
 
 INCLUDES	=	./includes/
-
-INCL_FILES	=	$(addprefix $(INCLUDES), ft_philo.h)
 
 SRCS		=	$(addprefix $(PREFIX), \
 								ft_philo.c \
@@ -31,7 +29,7 @@ OBJS		=	${SRCS:.c=.o}
 
 CC			=	clang-9
 
-CFLAGS		=	-pthread -Werror -Wextra -Wall -I ${INCLUDES}
+CFLAGS		=	-pthread -Werror -Wextra -Wall -I ${INCLUDES} -MMD
 
 NAME 		=	philo_two
 
@@ -40,7 +38,7 @@ RM			=	rm -f
 all:
 			${MAKE} ${NAME}
 
-${NAME}:	${OBJS} ${INCL_FILES}
+${NAME}:	${OBJS}
 			${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 
 run:		all
@@ -56,3 +54,5 @@ fclean:
 re:			fclean all
 
 .PHONY: 	all re run clean fclean
+
+-include	$(OBJS:.o=.d)
